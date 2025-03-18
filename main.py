@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import plotly.express as px
+import folium
+from streamlit_folium import st_folium
 
 # set page configurations
 st.set_page_config(
@@ -16,8 +18,8 @@ metro_var = "Dallas-Fort Worth"
 default_county = "Dallas"
 state_var = "Texas"
 stateAbbrev_var = "TX"
-map_starting_zoom = 8
-map_starting_extent = [32.9935342827898, -96.90176513963999]
+map_starting_zoom = 8.5
+map_starting_extent = [32.99, -96.90]
 county_options = [
     "Collin",
     "Dallas",
@@ -145,56 +147,50 @@ county_outlines['selected'] = county_outlines['NAME'].isin(county_var)
 county_outlines['selected'] = county_outlines['selected'].map(
     {True: 'Selected', False: 'Not Selected'})
 
-# Create a Plotly Express map with the loaded Geopackage data
-fig = px.choropleth_mapbox(
-    county_outlines,
-    geojson=county_outlines.geometry,
-    locations=county_outlines.index,
-    color='selected',
-    color_discrete_map={
-        "Selected": "rgba(8,48,107,0.7)",  # Navy blue fill for selected
-        "Not Selected": "rgba(0,0,0,0)"    # Transparent for not selected
+# create 'style' dictionary for selected counties based on 'selected' column
+county_outlines['style'] = county_outlines.apply(
+    lambda row: {
+        'fillColor': '#08306b' if row['selected'] == 'Selected' else 'rgba(0,0,0,0)',
+        'fillOpacity': 0.6,
+        'weight': 2,
+        'opacity': 1,
+        'color': '#08306b',
     },
-    custom_data=['NAME'],
-    center={'lat': map_starting_extent[0], 'lon': map_starting_extent[1]},
-    zoom=map_starting_zoom,
-    mapbox_style='streets',
-    labels={'NAME': 'County'},
+    axis=1
 )
 
-
-# Update the map layout
-fig.update_layout(
-    mapbox_accesstoken='pk.eyJ1Ijoid3dyaWdodDIxIiwiYSI6ImNsZTV3NWplcDBiam4zbnBoMDRqOGJhY2QifQ.Y8ZdfLVFyETj4qc8JNiaHw',
-    margin={"r": 0, "t": 0, "l": 0, "b": 0},
-    showlegend=False,
+# FOLIUM MAP
+m = folium.Map(
+    location=[map_starting_extent[0], map_starting_extent[1]],
+    zoom_start=map_starting_zoom,
+    tiles='https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    attr='CartoDB.Voyager',
+    dragging=False,
+    scrollWheelZoom=False,
+    zoom_control=False,
 )
 
-# Will color all county borders, regardless of selection
-fig.update_traces(
-    hovertemplate="<b>%{customdata[0]} County</b><extra></extra>",
-    marker_line_color='black',
-    marker_line_width=1,
-    hoverlabel=dict(
-        bgcolor="#fffaf6",     # Background color
-        font_size=14,        # Font size
-        font_family="Monospace",  # Font family
-        font_color="black",  # Text color
-        bordercolor="black",  # Border color
-    )
+tooltip = folium.features.GeoJsonTooltip(
+    fields=['NAME'],
+    labels=False,
+    sticky=True,
+    style="""
+            background-color: red;
+            border: 1px solid black;
+            border-radius: 5px;
+            box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.25);
+            padding: 4px;
+            font-size: 18px;
+        """
 )
 
-# hide modebar
-config = {'displayModeBar': False}
+folium.GeoJson(
+    county_outlines,
+    tooltip=tooltip,
+).add_to(m)
 
-# Display the map
-st.plotly_chart(
-    fig,
-    config=config,
-    theme='streamlit',
-    use_container_width=True
-)
-
+# add the map to the Streamlit app
+st_data = st_folium(m, height=400, use_container_width=True)
 
 # horizontal line
 st.write('---')
@@ -653,11 +649,10 @@ hide_default_format = """
             padding-bottom: 0px;
             padding-left: 0px;
         }
-        div[class="mapboxgl-map"] {
-            border: 2px solid black;
-        }
-        .stMainBlockContainer {
-            max-width: 800px;  
+        iframe[data-testid="stCustomComponentV1"] {
+            border: 2px solid #08306b;
+            border-radius: 7px;
+            height: 400px;
         }
     </style>
 """
