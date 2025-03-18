@@ -21,7 +21,7 @@ map_starting_extent = [32.9935342827898, -96.90176513963999]
 county_options = [
     "Collin",
     "Dallas",
-    "Denton"
+    "Denton",
     "Tarrant",
 ]
 
