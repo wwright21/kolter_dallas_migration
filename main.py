@@ -18,6 +18,12 @@ state_var = "Texas"
 stateAbbrev_var = "TX"
 map_starting_zoom = 8
 map_starting_extent = [32.9935342827898, -96.90176513963999]
+county_options = [
+    "Collin",
+    "Dallas",
+    "Denton"
+    "Tarrant",
+]
 
 # sidebar containing st.multiselect for county selection
 with st.sidebar:
@@ -39,12 +45,7 @@ with st.sidebar:
 
     county_var = st.multiselect(
         label="",
-        options=[
-            "Dallas",
-            "Tarrant",
-            "Collin",
-            "Denton"
-        ],
+        options=county_options,
         default=[default_county],
     )
 
