@@ -628,7 +628,7 @@ st.write("")
 col1, col2 = st.columns([4, 1])
 col1.markdown(
     f"""
-    For questions about this data explorer or the source data, please contact Will Wright by clicking <a href="mailto:williamcwrightjr@gmail.com?subject=Question about {county_var} County Migration Dashboard" style="text-decoration: none; color: #08306b;"><b>here</b>.</a> 
+    For questions about this data explorer or the source data, please contact Will Wright by clicking <a href="mailto:williamcwrightjr@gmail.com?subject=Question about {metro_var} County Migration Dashboard" style="text-decoration: none; color: #08306b;"><b>here</b>.</a> 
     """,
     unsafe_allow_html=True)
 col2.image('Assets/kolter2.png', width=100)
