@@ -137,10 +137,16 @@ else:
     )
 
 # -v-v-v-v-v- CONTEXT MAP v-v-v-v-v-
-# load the Geopackage file
-county_outlines = gpd.read_file(
-    'Assets/county_outlines.gpkg',
-)
+
+
+@st.cache_data
+def load_county_outlines():
+    """Load the county outlines from the GeoPackage."""
+    return gpd.read_file('Assets/county_outlines.gpkg')
+
+
+# Load the GeoPackage only once and store the result
+county_outlines = load_county_outlines()
 
 # Set the 'selected' column to True for the 'Dallas' county
 county_outlines['selected'] = county_outlines['NAME'].isin(county_var)
