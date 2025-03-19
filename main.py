@@ -227,8 +227,10 @@ dash_variable_dict = {
 
 if len(county_var) == 0:
     line_chart_title = "Please select a county from the sidebar to see annual trends"
-else:
+elif len(county_var) <= 2:
     line_chart_title = f'Net Migration of {dash_variable} into {formatted_counties} County Since 2016'
+else:
+    line_chart_title = f'Net Migration of {dash_variable} into <br> {formatted_counties} Counties Since 2016'
 
 # create fig object
 fig = px.line(
